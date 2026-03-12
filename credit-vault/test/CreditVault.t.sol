@@ -44,4 +44,25 @@ contract CreditVaultTest is Test {
         vm.prank(user1);
         vault.withdraw(0.4 ether); // allowed to withdraw
     }
+    
+    function testRepayAndWidthdraw() public {
+        vm.prank(user1);
+        vault.deposit{value: 1 ether}();
+
+        vm.prank(user1);
+        vault.mint(0.5 ether);
+
+        // give tokens to user for repay
+        CreditToken token = vault.credit();
+        token.mint(user1, 0.5 ether);
+
+        vm.prank(user1);
+        token.approve(address(vault), 0.5 ether);
+
+        vm.prank(user1);
+        vault.repay(0.5 ether); // repay all debt
+
+        vm.prank(user1);
+        vault.withdraw(1 ether); // now can withdraw full
+    }
 }

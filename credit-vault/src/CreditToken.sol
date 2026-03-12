@@ -21,7 +21,7 @@ contract CreditToken is ERC20 {
     }
 
     function burn(address from, uint256 amount) external {
-        if (msg.sender != vault) revert OnlyVault();
+        require(msg.sender == vault, "Only vault can burn tokens");
         // Internal ERC20 function that destroys tokens
         _burn(from, amount);
     }

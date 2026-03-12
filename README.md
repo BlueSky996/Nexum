@@ -163,6 +163,9 @@ The Bond token is deployed automatically inside the vault constructor.
 You can retrieve it by calling:
 
 vault.credit()
+
+
+
 Running the Project Locally
 Requirements
 
@@ -204,6 +207,8 @@ http://localhost:3000/vault
 
 Then connect MetaMask and interact with the vault.
 
+
+
 Issues Encountered During Development
 Token ownership & gas optimization
 
@@ -222,17 +227,17 @@ Several improvements were introduced to improve security and efficiency:
 
 Added ReentrancyGuard
 
-Added non-zero value checks
+aadded non-zero value checks
 
 Added events for important actions
 
-Introduced immutable fields
+introduced immutable fields
 
 Added MAX_LTV_PERCENT constant
 
 Implemented a maxMintable() helper function
 
-Used call instead of transfer for ETH sends
+used call instead of transfer for ETH sends
 
 Replaced revert strings with custom errors
 
@@ -240,7 +245,7 @@ These changes improve both safety and gas efficiency.
 
 Mint / borrow math and CEI ordering
 
-The contract logic was updated to follow the Checks → Effects → Interactions (CEI) pattern.
+the contract logic was updated to follow the Checks → Effects → Interactions (CEI) pattern.
 
 Specifically:
 
@@ -248,17 +253,17 @@ LTV checks are performed first
 
 Debt state is updated before external interactions
 
-Token minting occurs after internal state updates
+token minting occurs after internal state updates
 
 The mint() function was updated to compute the allowable borrow amount correctly and update user debt before minting tokens.
 
-Withdraw rounding and available calculation
+withdraw rounding and available calculation
 
-There was confusion around the withdrawable collateral calculation due to rounding behavior.
+there was confusion around the withdrawable collateral calculation due to rounding behavior.
 
 The logic was corrected by:
 
-using consistent rounding (ceil-style math when needed)
+using consistent rounding 
 
 ensuring maxWithdrawable() always returns an accurate amount
 
@@ -282,42 +287,5 @@ strict tests comparing exact encoded custom error values
 
 adjusting withdraw amounts so available > 0 when expected
 
-Results
-
-The final project successfully demonstrates:
-
-A working collateralized vault
-
-A custom ERC20 borrowing token
-
-Automated smart contract tests using Foundry
-
-Deployment to a public testnet
-
-A minimal frontend for interacting with the contract
-
-Possible Improvements
-
-Future improvements could include:
-
-liquidation mechanisms
-
-price oracle integration (Chainlink)
-
-interest rates on borrowed assets
-
-improved UI/UX for the frontend
-
-additional smart contract test coverage
 
 ----------------------------
-
-Built as part of a developer apprenticeship coding challenge to demonstrate full-stack Web3 development skills including:
-
-Solidity development
-
-smart contract testing
-
-dApp frontend integration
-
-blockchain deployment workflows

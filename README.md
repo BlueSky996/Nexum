@@ -127,7 +127,7 @@ Run tests with:
 
 forge test -vvv
 
-![Test](doc/screenshots/vvv_test.png)
+(doc/screenshots/vvv_test.png)
 
 forge test --gas-report
 

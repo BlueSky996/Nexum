@@ -2,7 +2,7 @@
 pragma solidity ^0.8.20;
 
 import "./CreditToken.sol";
-import "../lib/openzeppelin-contracts-master/contracts/security/ReentrancyGuard.sol";
+import "../lib/openzeppelin-contracts-master/contracts/utils/ReentrancyGuard.sol";
 
 error ZeroAmount();
 error ExceedsBorrowLimit(uint256 requested, uint256 max);
@@ -35,7 +35,7 @@ contract CreditVault is ReentrancyGuard {
         deposit();
     }
 
-    function deposit() external payable {
+    function deposit() public payable {
         if (msg.value == 0) revert ZeroAmount();
         collateral[msg.sender] += msg.value;
         emit Deposit(msg.sender, msg.value);
@@ -48,7 +48,7 @@ contract CreditVault is ReentrancyGuard {
         uint256 _allowable = (_coll * MAX_LTV_PERCENT) / 100;
         uint256 newDebt = debt[msg.sender] + amount;
 
-        if (newDebt > _allowable) revert ExceedsBorrowLimit(amount, allowable - debt[msg.sender]);
+        if (newDebt > _allowable) revert ExceedsBorrowLimit(amount, _allowable - debt[msg.sender]);
 
         debt[msg.sender] = newDebt;
 
@@ -77,16 +77,14 @@ contract CreditVault is ReentrancyGuard {
     }
 
 
-    function withdraw(uint256 amount) external nonReetrant{
+    function withdraw(uint256 amount) external nonReentrant {
         if (amount == 0) revert ZeroAmount();
         
         uint256 userColl = collateral[msg.sender];
-        if(amount > userColl) revert InsufficentCollateral(amount, userColl);
+        if(amount > userColl) revert InsufficientCollateral(amount, userColl);
 
         uint256 newColl = userColl - amount;
-        uint256 requiredCollateralForDebt = (debt[msg.sender] * 100 + MAX_LTV_PERCENT - 1) / MAX_LTV_PERCENT;
-
-        if (debt[msg.sender] > 0 && newColl * MAX-LTV_PERCENT < debt[msg.sender] * 100) {
+        if (debt[msg.sender] > 0 && newColl * MAX_LTV_PERCENT < debt[msg.sender] * 100) {
             revert InsufficientCollateral(amount, userColl - ((debt[msg.sender] * 100 / MAX_LTV_PERCENT)));
         }  
 

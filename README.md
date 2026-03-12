@@ -121,13 +121,18 @@ Key properties:
 
 Tests are written using **Foundry**.
 
+vvv Test result
+
+![Tests](doc/screenshots/vvv_test.png)
+
+
 Run tests with:
 
 ```bash
 
 forge test -vvv
 
-![Tests](doc/screenshots/vvv_test.png)
+
 
 forge test --gas-report
 

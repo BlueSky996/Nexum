@@ -1,4 +1,4 @@
-// SPDX- License-Identifier: MIT
+// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
 import "forge-std/Test.sol";
@@ -26,7 +26,9 @@ contract CreditVaultTest is Test {
         vault.mint(0.5 ether); // should successd . total below LTV limit
 
         vm.prank(user1);
-        vm.expectRevert(ExceedsBorrowLimit.selector); // check if we revert for the correct reason
+        vm.expectRevert(
+            abi.encodeWithSelector(ExceedsBorrowLimit.selector, 0.1 ether, 0.5 ether - 0.5 ether)
+        ); // check if we revert for the correct reason
         vault.mint(0.1 ether); // should fail . total 0.1 above LTV limit
     }
 
@@ -35,14 +37,16 @@ contract CreditVaultTest is Test {
         vault.deposit{value: 1 ether}();
 
         vm.prank(user1);
-        vault.mint(0.5 ether);
+        vault.mint(0.4 ether);
 
         vm.prank(user1);
-        vm.expectRevert(InsufficientCollateral.selector);
+        vm.expectRevert(
+            abi.encodeWithSelector(InsufficientCollateral.selector, 0.6 ether, 0.2 ether)
+        );  
         vault.withdraw(0.6 ether); // can't break 50% LTV
 
         vm.prank(user1);
-        vault.withdraw(0.4 ether); // allowed to withdraw
+        vault.withdraw(0.2 ether); // allowed to withdraw
     }
     
     function testRepayAndWidthdraw() public {
@@ -54,7 +58,6 @@ contract CreditVaultTest is Test {
 
         // give tokens to user for repay
         CreditToken token = vault.credit();
-        token.mint(user1, 0.5 ether);
 
         vm.prank(user1);
         token.approve(address(vault), 0.5 ether);

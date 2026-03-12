@@ -6,7 +6,7 @@ import "../lib/openzeppelin-contracts-master/contracts/utils/ReentrancyGuard.sol
 
 error ZeroAmount();
 error ExceedsBorrowLimit(uint256 requested, uint256 max);
-error InsufficientCollateral(uint256 requestedWithdraw, uint256 avaliable);
+error InsufficientCollateral(uint256 requestedWithdraw, uint256 available);
 error RepayTooLarge(uint256 repay, uint256 debt);
 error SendFailed();
 

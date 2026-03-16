@@ -126,35 +126,36 @@ vvv Test result
 ![Tests](doc/screenshots/vvv_test.png)
 
 
-Run tests with:
+Tests are written using **Foundry**.
 
-```bash
+Run tests with:
 
 forge test -vvv
 
-
+To generate a gas report:
 
 forge test --gas-report
 
-Current test cases include:
 
-testMintLimit
+### Current Test Cases
 
-Ensures users cannot mint more tokens than allowed by the LTV rule.
+- **testMintLimit**  
+  Ensures users cannot mint more tokens than allowed by the LTV rule.
 
-testWithdrawSafety
+- **testWithdrawSafety**  
+  Ensures users cannot withdraw collateral if doing so would break the collateralization ratio.
 
-Ensures users cannot withdraw collateral if doing so would break the collateralization ratio.
+- **testRepayAndWithdraw**  
+  Verifies that after repaying the full debt, the user can withdraw all their collateral.
 
-testRepayAndWithdraw
 
-Verifies that after repaying the full debt, the user can withdraw all their collateral.
+---
 
-Deployment
+## Deployment
 
-The contract was deployed to Base Sepolia Testnet.
+The contract was deployed to **Base Sepolia Testnet**.
 
-Vault Contract Address:
+Vault Contract Address
 
 0x13aaCcF54a96D9eD9848Aee73e4A5c15BF0d7127
 
@@ -165,55 +166,71 @@ You can retrieve it by calling:
 vault.credit()
 
 
+---
 
-Running the Project Locally
-Requirements
+## Running the Project Locally
+
+### Requirements
 
 You will need:
 
-Node.js
+- Node.js
+- Foundry
+- MetaMask
 
-Foundry
 
-MetaMask
+### Install Foundry
 
-Install Foundry:
-
-curl -L https://foundry.paradigm.xyz | bash
+curl -L https://foundry.paradigm.xyz | bash  
 foundryup
-Clone the Repository
-git clone <repo-url>
+
+
+### Clone the Repository
+
+git clone <repo-url>  
 cd <repo>
-Run Smart Contract Tests
-forge build
+
+
+### Run Smart Contract Tests
+
+forge build  
 forge test
-Run the Frontend
+
+
+### Run the Frontend
 
 Navigate to the frontend folder:
 
 cd frontend
 
+
 Install dependencies:
 
 npm install
+
 
 Run the development server:
 
 npm run dev
 
-Open:
+
+Open in browser:
 
 http://localhost:3000/vault
+
 
 Then connect MetaMask and interact with the vault.
 
 
+---
 
-Issues Encountered During Development
-Token ownership & gas optimization
+## Issues Encountered During Development
 
-The CreditToken contract was updated to accept the vault address in its constructor, ensuring that only the vault can mint or burn tokens.
-The vault reference was also marked as immutable to reduce gas costs.
+
+### Token Ownership & Gas Optimization
+
+The CreditToken contract was updated to accept the vault address in its constructor, ensuring that only the vault can mint or burn tokens.  
+The vault reference was also marked as **immutable** to reduce gas costs.
 
 Additionally, string-based revert messages were replaced with a custom error:
 
@@ -221,71 +238,68 @@ OnlyVault()
 
 Custom errors reduce deployment and runtime gas usage compared to revert strings.
 
-Missing safety and gas improvements
+
+---
+
+### Missing Safety and Gas Improvements
 
 Several improvements were introduced to improve security and efficiency:
 
-Added ReentrancyGuard
-
-aadded non-zero value checks
-
-Added events for important actions
-
-introduced immutable fields
-
-Added MAX_LTV_PERCENT constant
-
-Implemented a maxMintable() helper function
-
-used call instead of transfer for ETH sends
-
-Replaced revert strings with custom errors
+- Added ReentrancyGuard
+- Added non-zero value checks
+- Added events for important actions
+- Introduced immutable fields
+- Added MAX_LTV_PERCENT constant
+- Implemented a maxMintable() helper function
+- Used call instead of transfer for ETH sends
+- Replaced revert strings with custom errors
 
 These changes improve both safety and gas efficiency.
 
-Mint / borrow math and CEI ordering
 
-the contract logic was updated to follow the Checks → Effects → Interactions (CEI) pattern.
+---
+
+### Mint / Borrow Math and CEI Ordering
+
+The contract logic was updated to follow the **Checks Effects Interactions (CEI)** pattern.
 
 Specifically:
 
-LTV checks are performed first
-
-Debt state is updated before external interactions
-
-token minting occurs after internal state updates
+- LTV checks are performed first
+- Debt state is updated before external interactions
+- Token minting occurs after internal state updates
 
 The mint() function was updated to compute the allowable borrow amount correctly and update user debt before minting tokens.
 
-withdraw rounding and available calculation
 
-there was confusion around the withdrawable collateral calculation due to rounding behavior.
+---
+
+### Withdraw Rounding and Available Calculation
+
+There was confusion around the withdrawable collateral calculation due to rounding behavior.
 
 The logic was corrected by:
 
-using consistent rounding 
+- Using consistent rounding
+- Ensuring maxWithdrawable() always returns an accurate amount
+- Updating the InsufficientCollateral(amount, available) error to return the correct available amount
 
-ensuring maxWithdrawable() always returns an accurate amount
 
-updating the InsufficientCollateral(amount, available) error to return the correct available amount
+---
 
-Foundry tests failing due to exact custom-error bytes
+### Foundry Tests Failing Due to Exact Custom Error Bytes
 
 Some tests initially failed because the exact encoded custom error parameters did not match the expected values.
 
 This was fixed by:
 
-computing the exact expected parameters
+- Computing the exact expected parameters
+- Encoding the error using abi.encodeWithSelector(...)
+- Using vm.expectRevert() where only the revert type mattered
 
-encoding the error using abi.encodeWithSelector(...)
+Final testing approach:
 
-using vm.expectRevert() where only the revert type mattered
-
-Final test strategy:
-
-strict tests comparing exact encoded custom error values
-
-adjusting withdraw amounts so available > 0 when expected
-
+- Strict tests comparing exact encoded custom error values
+- Adjusted withdraw amounts so available > 0 when expected
 
 ----------------------------
